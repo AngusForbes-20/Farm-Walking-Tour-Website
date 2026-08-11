@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Walk Planner — Southridge Farm Walking Tour</title>
+    <link rel="stylesheet" href="stylesheet.css" />
+    <style>
+      .section-container {
+        max-width: var(--max-width);
+        margin: 0 auto;
+        padding: 2.5rem 1.5rem 4rem;
+      }
+
+      /* ── Tool layout ── */
+      .tool-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        align-items: start;
+      }
+
+      @media (max-width: 640px) {
+        .tool-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* ── Inputs panel ── */
+      .tool-panel {
+        background: var(--color-parchment);
+        border: 1px solid var(--color-stone-light);
+        border-radius: var(--radius-lg);
+        padding: 1.75rem 2rem;
+        box-shadow: var(--shadow-card);
+      }
+
+      .tool-panel h3 {
+        font-family: var(--font-display);
+        font-size: 1.15rem;
+        color: var(--color-bark);
+        margin-bottom: 1.25rem;
+        font-style: normal;
+        font-weight: 600;
+      }
+
+      /* Stop checkboxes */
+      .stop-checkbox-list {
+        list-style: none;
+        margin: 0 0 1.5rem;
+        display: grid;
+        gap: 0.6rem;
+      }
+
+      .stop-checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.7rem 0.9rem;
+        border: 1.5px solid var(--color-stone-light);
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: border-color 0.15s, background 0.15s;
+        background: var(--color-cream);
+      }
+
+      .stop-checkbox-item:has(input:checked) {
+        border-color: var(--color-moss);
+        background: rgba(74, 94, 58, 0.07);
+      }
+
+      .stop-checkbox-item input[type="checkbox"] {
+        accent-color: var(--color-moss);
+        width: 17px;
+        height: 17px;
+        flex-shrink: 0;
+        cursor: pointer;
+      }
+
+      .stop-checkbox-item__label {
+        font-size: 0.95rem;
+        color: var(--color-soil);
+        cursor: pointer;
+        flex: 1;
+      }
+
+      .stop-checkbox-item__dist {
+        font-size: 0.78rem;
+        color: var(--color-stone);
+        white-space: nowrap;
+      }
+
+      /* Pace selector */
+      .field-group {
+        margin-bottom: 1.25rem;
+      }
+
+      .field-label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--color-moss);
+        margin-bottom: 0.5rem;
+      }
+
+      .field-select {
+        width: 100%;
+        padding: 0.65rem 0.9rem;
+        border: 1.5px solid var(--color-stone-light);
+        border-radius: var(--radius-md);
+        font-family: var(--font-body);
+        font-size: 0.95rem;
+        color: var(--color-soil);
+        background: var(--color-cream);
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239e9488' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.9rem center;
+        cursor: pointer;
+      }
+
+      .field-select:focus {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 1px;
+        border-color: var(--color-accent);
+      }
+
+      /* Weight input */
+      .field-input {
+        width: 100%;
+        padding: 0.65rem 0.9rem;
+        border: 1.5px solid var(--color-stone-light);
+        border-radius: var(--radius-md);
+        font-family: var(--font-body);
+        font-size: 0.95rem;
+        color: var(--color-soil);
+        background: var(--color-cream);
+      }
+
+      .field-input:focus {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 1px;
+        border-color: var(--color-accent);
+      }
+
+      /* Calculate button */
+      .btn-calculate {
+        width: 100%;
+        background: var(--color-moss);
+        color: var(--color-parchment);
+        border: none;
+        border-radius: var(--radius-md);
+        padding: 0.8rem 1.5rem;
+        font-family: var(--font-display);
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.1s;
+        margin-top: 0.5rem;
+      }
+
+      .btn-calculate:hover {
+        background: var(--color-bark);
+      }
+
+      .btn-calculate:active {
+        transform: scale(0.98);
+      }
+
+      /* ── Results panel ── */
+      .results-panel {
+        background: var(--color-parchment);
+        border: 1px solid var(--color-stone-light);
+        border-radius: var(--radius-lg);
+        padding: 1.75rem 2rem;
+        box-shadow: var(--shadow-card);
+      }
+
+      .results-panel h3 {
+        font-family: var(--font-display);
+        font-size: 1.15rem;
+        color: var(--color-bark);
+        margin-bottom: 1.25rem;
+        font-style: normal;
+        font-weight: 600;
+      }
+
+      /* Empty state */
+      .results-empty {
+        color: var(--color-stone);
+        font-style: italic;
+        font-size: 0.95rem;
+        padding: 1rem 0;
+      }
+
+      /* Stat rows */
+      .result-stats {
+        display: none;
+      }
+
+      .result-stats.is-visible {
+        display: block;
+      }
+
+      .stat-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--color-stone-light);
+        gap: 1rem;
+      }
+
+      .stat-row:last-child {
+        border-bottom: none;
+      }
+
+      .stat-label {
+        font-size: 0.88rem;
+        color: var(--color-stone);
+        flex-shrink: 0;
+      }
+
+      .stat-value {
+        font-family: var(--font-display);
+        font-size: 1.3rem;
+        color: var(--color-bark);
+        font-weight: 600;
+        text-align: right;
+      }
+
+      .stat-value small {
+        font-size: 0.75rem;
+        color: var(--color-stone);
+        font-family: var(--font-body);
+        font-weight: 400;
+      }
+
+      /* Selected stops summary */
+      .result-stops-list {
+        list-style: none;
+        margin: 1rem 0 0;
+      }
+
+      .result-stops-list li {
+        font-size: 0.88rem;
+        padding: 0.3rem 0;
+        color: var(--color-bark-light);
+        display: flex;
+        gap: 0.5rem;
+        align-items: baseline;
+      }
+
+      .result-stops-list li::before {
+        content: "✦";
+        color: var(--color-accent);
+        font-size: 0.65rem;
+        flex-shrink: 0;
+        position: relative;
+        top: -1px;
+      }
+
+      /* Error state */
+      .results-error {
+        background: rgba(180, 50, 30, 0.07);
+        border: 1px solid rgba(180, 50, 30, 0.25);
+        border-radius: var(--radius-md);
+        padding: 0.9rem 1.1rem;
+        color: #8a2210;
+        font-size: 0.9rem;
+        display: none;
+      }
+
+      .results-error.is-visible {
+        display: block;
+      }
+
+      /* About the calculation */
+      .tool-footnote {
+        font-size: 0.82rem;
+        color: var(--color-stone);
+        margin-top: 1.5rem;
+        font-style: italic;
+        line-height: 1.6;
+      }
+    </style>
+  </head>
+  <body>
+
+    <!-- SITE HEADER AND NAVIGATION BAR -->
+    <header class="site-header">
+      <div class="container">
+        <a href="index.html" class="site-header-title">Southridge Farm Walking Tour</a>
+        <nav class="main-nav">
+          <a href="index.html">Home</a>
+          <a href="stops-1-2.html">Stops 1 &amp; 2</a>
+          <a href="stops-3-4.html">Stops 3 &amp; 4</a>
+          <a href="quiz.html">Quiz</a>
+          <a href="tool.html" class="active">Walk Planner</a>
+          <a href="explanation-page.html">Written Explanation</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- PAGE TITLE -->
+    <div class="page=title">
+      <div class="container">
+        <p class="breadcrumb-trail"><a href="index.html">Home</a> &rsaquo; Walk Planner</p>
+        <p class="page-title-indicator">Page 4 of 4</p>
+        <h1 class="page-title-first">Walk Planner</h1>
+      </div>
+    </div>
+
+    <main id="main-content">
+      <div class="section-container">
+
+        <p style="margin-bottom:2rem; color:var(--color-bark-light);">
+          Choose which stops you'd like to visit, set your pace and weight, and the planner
+          will calculate your estimated walk time, total distance, and calories burned.
+        </p>
+
+        <div class="tool-grid">
+
+          <!-- ── INPUTS ── -->
+          <div class="tool-panel">
+            <h3>Plan Your Walk</h3>
+
+            <!-- Stop selection -->
+            <div class="field-group">
+              <span class="field-label">Select your stops</span>
+              <ul class="stop-checkbox-list" id="stop-checkboxes">
+                <!-- Populated by JS -->
+              </ul>
+            </div>
+
+            <!-- Pace selector -->
+            <div class="field-group">
+              <label class="field-label" for="pace-select">Walking pace</label>
+              <select class="field-select" id="pace-select">
+                <option value="leisurely">Leisurely (2 km/h) — stop and smell the roses</option>
+                <option value="easy" selected>Easy (3 km/h) — relaxed stroll</option>
+                <option value="moderate">Moderate (4 km/h) — comfortable stride</option>
+                <option value="brisk">Brisk (5 km/h) — purposeful walk</option>
+              </select>
+            </div>
+
+            <!-- Weight input -->
+            <div class="field-group">
+              <label class="field-label" for="weight-input">Your weight (kg)</label>
+              <input
+                type="number"
+                class="field-input"
+                id="weight-input"
+                value="70"
+                min="30"
+                max="200"
+                step="1"
+              />
+            </div>
+
+            <button class="btn-calculate" id="btn-calculate">Calculate my walk →</button>
+          </div>
+
+          <!-- ── RESULTS ── -->
+          <div class="results-panel" id="results-panel">
+            <h3>Your Walk Summary</h3>
+
+            <p class="results-empty" id="results-empty">
+              Select at least one stop and hit "Calculate" to see your walk plan.
+            </p>
+
+            <div class="results-error" id="results-error"></div>
+
+            <div class="result-stats" id="result-stats">
+              <div class="stat-row">
+                <span class="stat-label">Total distance</span>
+                <span class="stat-value" id="result-distance">— <small>km</small></span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Estimated time</span>
+                <span class="stat-value" id="result-time">— <small>min</small></span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Calories burned</span>
+                <span class="stat-value" id="result-calories">— <small>kcal</small></span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Walking pace</span>
+                <span class="stat-value" id="result-pace">— <small>km/h</small></span>
+              </div>
+              <div class="stat-row" style="border-bottom:none; padding-bottom:0;">
+                <span class="stat-label">Stops included</span>
+                <span class="stat-value" id="result-stop-count">—</span>
+              </div>
+
+              <ul class="result-stops-list" id="result-stops-list"></ul>
+            </div>
+
+            <p class="tool-footnote" id="tool-footnote" style="display:none;">
+              Distances are approximate estimates based on the farm layout. Calorie
+              calculation uses the MET (Metabolic Equivalent of Task) method:
+              <em>Calories = MET × weight (kg) × time (hours)</em>.
+              MET values: leisurely 2.5, easy 3.0, moderate 3.5, brisk 4.5.
+            </p>
+          </div>
+
+        </div>
+
+        <div style="margin-top:2.5rem;">
+          <a href="index.html">&larr; Back to the map</a>
+          &nbsp;&nbsp;
+          <a href="quiz.html">Test your knowledge on the Quiz →</a>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <div class="container">
+        <p>Southridge Farm Walking Tour &nbsp;·&nbsp; Relationship between Living Spaces &amp; Nature</p>
+        <p style="margin-top:0.4rem;">
+          <a href="index.html">Home</a> &nbsp;&middot;&nbsp;
+          <a href="stops-1-2.html">Stops 1 &amp; 2</a> &nbsp;&middot;&nbsp;
+          <a href="stops-3-4.html">Stops 3 &amp; 4</a> &nbsp;&middot;&nbsp;
+          <a href="quiz.html">Quiz</a> &nbsp;&middot;&nbsp;
+          <a href="tool.html">Walk Planner</a> &nbsp;&middot;&nbsp;
+          <a href="explanation-page.html">Written Explanation</a>
+        </p>
+      </div>
+      <div class="divider"><span class="divider-icon">✦</span></div>
+    </footer>
+
+    <script src="main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Written-Explanation Southridge Farm Walking Tour</title>
+    <link rel="stylesheet" href="stylesheet.css" />
+  </head>
+  <body>
+    <!-- SITE HEADER AND NAVIGATION BAR -->
+    <header class="site-header">
+      <div class="container">
+        <a href="index.html" class="site-header-title"
+          >Southridge Farm Walking Tour</a
+        >
+        <nav class="main-nav">
+          <a href="index.html">Home</a>
+          <a href="stops-1-2.html">Stops 1 &amp; 2</a>
+          <a href="stops-3-4.html">Stops 3 &amp; 4</a>
+          <a href="explanation-page.html" class="active">Written Explanation</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- PAGE TITLE -->
+    <div class="page=title">
+      <div class="container">
+        <p class="breadcrumb-trail">
+          <a href="index.html">Home</a> &rsaquo; <a href="stops-1-2.html">Stops 1 &amp; 2</a> &rsaquo; <a href="stops-1-2.html">Stops 3 &amp; 4</a> &rsaquo; Written Explanation
+        </p>
+        <p class="page-title-indicator">Page 4 of 4</p>
+        <h1 class="page-title-first">Technical Summary &amp; Site Map</h1>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main id="main-content">
+      <div class="section-container">
+        <nav>
+          <h3 style="margin-bottom: 0.75rem">On this page</h3>
+          <ul
+            style="list-style: none; display: flex; gap: 1rem; flex-wrap: wrap"
+          >
+            <li>
+              <a href="#technical-summary" class="stop-tag tag-1">Technical Summary</a>
+            </li>
+            <li>
+              <a href="#site-map" class="stop-tag tag-2">Site Map</a>
+            </li>
+          </ul>
+        </nav>
+
+<!-- TECHNICAL EXPLANATION -->
+        <article class="stop">
+          <div class="stop-title-group">
+            <h2 class="stop-header" id="technical-summary">Technical Explanation</h2>
+            <div class="divider"><span class="divider-icon">✦</span></div>
+          </div>
+          <div class="stop-body">
+            <p>
+              The project consists of four HTML files which are all linked to a single CSS stylesheet file. Having a centralised stylesheet for all pages of the project makes it much easier to manage the visual appeal and usability of the HTML files as a cohesive website.
+            </p>
+            <p>
+              All images and videos on the stop pages are wrapped in `figure` with `figcaption` providing a brief explanation and crediting the source, all of which are myself. 
+            </p>
+            <p>
+              HTML entities were heavily utilised to great effect, allowing for certain characters to be displayed simply as text and not as code. Such as & or arrow symbols. 
+            </p>
+            <p>
+              CSS naming convention used was kebab-case. It's very easy to read and code with. Sometimes I'd add a double underscore to specify certain things, as I was getting some overwhelm when giving elemnts classes. The @import at the top of stylesheet.css loads in Lora for body text and Playfair Display for headings.
+            </p>
+            <p>
+              semantic HTML elements are used throughout the project to make it more readable and structured than simply using `div` for everything. `strong` is used for importance rather than `b` and `em` for stress emphasis rather than `i`
+            </p>
+            <p>
+              The .css file uses custom properties that are defined using ': root' to easily create a cohesive aesthetic across colours, fonts and various spacing related stylings. The navigation bar and footer use CSS Flexbox. 'clamp-()' is applied to headings to make sure writing scales properly so that media doesn't need as much adjustment.
+            </p>
+            <p>
+              Breakpoints were utilised at 768px by 480px to ensure the webpages are accessible on smaller screens and mobile.
+            </p>
+          </div>
+    </article>
+        <!-- JAVASCRIPT EXPLANATION -->
+        <article class="stop">
+          <div class="stop-title-group">
+            <h2 class="stop-header" id="javascript-summary">JavaScript</h2>
+            <div class="divider"><span class="divider-icon">✦</span></div>
+          </div>
+          <div class="stop-body">
+            <p>
+              The whole of main.js is broken down into three different init functions: initMap(), initQuiz() and initTool(). Each gets called at the bottom when the page is loaded using DOMContentLoaded. Each function checks what key elements are existing within the page before actually doing anything, which allows the single file to be on every page without throwing errors.
+            </p>
+            <p>
+              Shared data has a STOPS array which holds an object for each of the four stops, with info such as name, page link, a blurb and distance. For initMap there are SVG markers in index.html which each have the attribute data-stop with a number. The function grabs all of them with querySelectorAll, then loops through them and attaches click event listeners. When clicked, it reads the stop ID from data-stop then finds the matching object in the STOPS array using the function find(). Finally it puts the details into the info panel below the map using textContent and href for assignment.
+            </p>
+            <p>
+              For initQuiz the questions are stored as an array of objects. Each has the question text, an options array, the index of the right answer and two different strings for feedback, one correct one incorrect. When it loads, the array shuffles using a Fisher-Yates shuffle to randomly swap around the elements, making the order different each time. renderQuestion() reads the current question object to then make a &lt;button&gt; for each option using createElement, which sets text and attaches a click listener.
+            </p>
+            <p>
+              initTool has two data objects that sit outside the function. PACE_DATA maps each pace option and the stop objects give approximate distances between locations. The checkbox list is built by looping over the STOPS array and using createElement to generate each list item. The calories calculation uses the MET formula (MET &times; weight &times; time in hours).
+            </p>
+          </div>
+        </article>
+
+            <!-- SITE MAP -->
+        <figure>
+          <h2 class="stop-header" id="site-map">Site Map</h2>
+          <div class="divider"><span class="divider-icon">✦</span></div>
+            <img
+              class="stop-img"
+              src="/_assets/site-map-2.png"
+              alt="Orchard Photo 1"
+            />
+            <figcaption>
+              This obsidian graphdemonstrates how the consistent header navigation across every page of the project interconnects them, allowing for freedom of movement between sections. Source: Me
+            </figcaption>
+          </figure>        
+    </main>
+
+        <!-- PAGE INFO / WORD COUNT -->
+    <div class="divider"><span class="divider-icon">✦</span></div>
+    <div class="card">
+      <ul class="facts-list">
+        <li>
+          <span class="facts-list-label"
+            >Writing, Photography, Coding &amp; Appreciation of Nature by Angus
+            Forbes.</span
+          >
+        </li>
+        <li>
+          <span class="facts-list-label">Page Word Count:</span>
+          <span>443</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <div class="container">
+        <p>
+          Southridge Farm Walking Tour &nbsp;·&nbsp; Relationship between Living
+          Spaces &amp; Nature
+        </p>
+        <p style="margin-top: 0.4rem">
+          <a href="index.html">Home</a> &nbsp;&middot;&nbsp;
+          <a href="stops-1-2.html">Stops 1 &amp; 2</a> &nbsp;&middot;&nbsp;
+          <a href="stops-3-4.html">Stops 3 &amp; 4</a> &nbsp;&middot;&nbsp;
+          <a href="explanation-page.html">Written Explanation</a>
+        </p>
+      </div>
+      <div class="divider"><span class="divider-icon">✦</span></div>
+    </footer>
+  </body>
+</html>

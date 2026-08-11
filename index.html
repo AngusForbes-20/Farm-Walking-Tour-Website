@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Southridge Farm Walking Tour</title>
+    <link rel="stylesheet" href="stylesheet.css" />
+    <style>
+      /* ── Map styles ── */
+      .map-section {
+        margin: 2.5rem 0;
+      }
+
+      .map-wrapper {
+        position: relative;
+        width: 100%;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-card);
+        border: 1px solid var(--color-stone-light);
+        background: #e8e2d6;
+      }
+
+      .farm-map {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      /* Clickable stop markers */
+      .map-stop {
+        cursor: pointer;
+      }
+
+      .map-stop circle {
+        transition: r 0.2s ease, filter 0.2s ease;
+      }
+
+      .map-stop:hover circle {
+        filter: brightness(1.15);
+      }
+
+      .map-stop:focus {
+        outline: none;
+      }
+
+      .map-stop:focus circle {
+        stroke: var(--color-accent);
+        stroke-width: 3;
+      }
+
+      /* Info panel that appears below the map */
+      .stop-info-panel {
+        background: var(--color-parchment);
+        border: 1px solid var(--color-stone-light);
+        border-top: 3px solid var(--color-accent);
+        border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+        padding: 1.5rem 2rem;
+        display: none;
+      }
+
+      .stop-info-panel.is-visible {
+        display: block;
+      }
+
+      .stop-info-panel__eyebrow {
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--color-moss);
+        margin-bottom: 0.3rem;
+      }
+
+      .stop-info-panel__title {
+        font-family: var(--font-display);
+        font-size: 1.5rem;
+        color: var(--color-bark);
+        margin-bottom: 0.4rem;
+      }
+
+      .stop-info-panel__tagline {
+        font-style: italic;
+        color: var(--color-bark-light);
+        margin-bottom: 1rem;
+        font-size: 0.95rem;
+      }
+
+      .stop-info-panel__body {
+        font-size: 0.95rem;
+        line-height: 1.75;
+        color: var(--color-soil);
+        margin-bottom: 1.25rem;
+      }
+
+      .stop-info-panel__link {
+        display: inline-block;
+        background: var(--color-moss);
+        color: var(--color-parchment) !important;
+        text-decoration: none;
+        padding: 0.55rem 1.25rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.875rem;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        transition: background 0.2s;
+      }
+
+      .stop-info-panel__link:hover {
+        background: var(--color-bark);
+        text-decoration: none;
+      }
+
+      .map-hint {
+        font-size: 0.82rem;
+        font-style: italic;
+        color: var(--color-stone);
+        text-align: center;
+        margin-top: 0.6rem;
+      }
+
+      /* Section container for main content */
+      .section-container {
+        max-width: var(--max-width);
+        margin: 0 auto;
+        padding: 2.5rem 1.5rem 4rem;
+      }
+    </style>
+  </head>
+  <body>
+
+    <!-- SITE HEADER AND NAVIGATION BAR -->
+    <header class="site-header">
+      <div class="container">
+        <a href="index.html" class="site-header-title">Southridge Farm Walking Tour</a>
+        <nav class="main-nav">
+          <a href="index.html" class="active">Home</a>
+          <a href="stops-1-2.html">Stops 1 &amp; 2</a>
+          <a href="stops-3-4.html">Stops 3 &amp; 4</a>
+          <a href="quiz.html">Quiz</a>
+          <a href="tool.html">Walk Planner</a>
+          <a href="explanation-page.html">Written Explanation</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- PROJECT TITLE CARD -->
+    <section class="project-title">
+      <div class="container">
+        <p class="project-subtitle">A self-guided tour of</p>
+        <h1 id="project-heading">Southridge Farm</h1>
+        <p class="project-subtitle">Human Living Spaces in the Natural Landscape</p>
+        <p class="project-meta">
+          Created by <strong>Angus Forbes</strong> &nbsp;·&nbsp; 4 Stops &nbsp;·&nbsp; Explore at your own pace
+        </p>
+      </div>
+    </section>
+
+    <!-- MAIN CONTENT -->
+    <main id="main-content">
+      <section class="section-container">
+
+        <div class="card">
+          <h3>About This Tour</h3>
+          <div class="divider"><span class="divider-icon">✦</span></div>
+          <p>
+            Welcome to Southridge Farm. This interactive walking tour takes you
+            through four of the most special and meaningful places on the
+            property. These spaces highlight the value in balancing man-made
+            architecture and creations alongside nature. Each stop provides
+            unique utility within the natural environment: a quiet creative
+            space, a gathering place, a contemplative orchard, and a space for
+            physical activity.
+          </p>
+          <p>
+            <strong>Theme:</strong> Nature &amp; Living Spaces — how contemporary
+            humans extrapolate meaning from the natural environment.
+          </p>
+        </div>
+
+        <!-- INTERACTIVE MAP -->
+        <div class="map-section">
+          <div class="divider"><span class="divider-icon">✦</span></div>
+          <h2 style="text-align:center; margin-bottom:0.25rem;">Tour Map</h2>
+          <p class="map-hint">Tap a stop on the map to learn more</p>
+
+          <div class="map-wrapper">
+            <!--
+              SVG farm map — north is up.
+              Layout (approximate compass positions):
+                Studio    — north-east (top-right), near treeline/ridge
+                Fire Pit  — north-east, slightly below Studio, ridge edge
+                Orchard   — north-west (top-left), gentle slope
+                Shed      — south, near main gate/driveway
+            -->
+            <svg
+              class="farm-map"
+              viewBox="0 0 800 520"
+              xmlns="http://www.w3.org/2000/svg"
+              role="img"
+              aria-label="Interactive map of Southridge Farm showing four tour stops"
+            >
+              <!-- Sky / background -->
+              <defs>
+                <radialGradient id="sky" cx="50%" cy="0%" r="80%">
+                  <stop offset="0%" stop-color="#d4e8c2" />
+                  <stop offset="100%" stop-color="#c5d9a8" />
+                </radialGradient>
+                <radialGradient id="glow-studio" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#e8c99a" stop-opacity="0.7" />
+                  <stop offset="100%" stop-color="#e8c99a" stop-opacity="0" />
+                </radialGradient>
+                <radialGradient id="glow-firepit" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#e8c99a" stop-opacity="0.7" />
+                  <stop offset="100%" stop-color="#e8c99a" stop-opacity="0" />
+                </radialGradient>
+                <radialGradient id="glow-orchard" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#e8c99a" stop-opacity="0.7" />
+                  <stop offset="100%" stop-color="#e8c99a" stop-opacity="0" />
+                </radialGradient>
+                <radialGradient id="glow-shed" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#e8c99a" stop-opacity="0.7" />
+                  <stop offset="100%" stop-color="#e8c99a" stop-opacity="0" />
+                </radialGradient>
+              </defs>
+
+              <!-- Ground -->
+              <rect width="800" height="520" fill="url(#sky)" />
+
+              <!-- Ridge / elevation suggestion (north edge) -->
+              <path d="M0 0 Q200 80 400 60 Q600 40 800 70 L800 0 Z" fill="#b8ceaa" opacity="0.5" />
+
+              <!-- Ocean suggestion (far top-right, beyond ridge) -->
+              <path d="M520 0 Q650 30 800 10 L800 0 Z" fill="#a8c4d8" opacity="0.6" />
+              <text x="700" y="22" font-size="10" fill="#6a94aa" font-style="italic" font-family="Georgia, serif" text-anchor="middle">ocean →</text>
+
+              <!-- Treeline (north, dense) -->
+              <!-- cluster of tree circles -->
+              <g fill="#4a5e3a" opacity="0.75">
+                <circle cx="480" cy="55" r="28" />
+                <circle cx="520" cy="45" r="22" />
+                <circle cx="555" cy="58" r="26" />
+                <circle cx="590" cy="48" r="20" />
+                <circle cx="620" cy="60" r="24" />
+                <circle cx="650" cy="50" r="18" />
+                <circle cx="675" cy="62" r="22" />
+                <circle cx="700" cy="52" r="20" />
+                <circle cx="728" cy="62" r="26" />
+                <circle cx="760" cy="50" r="22" />
+                <circle cx="790" cy="60" r="18" />
+              </g>
+              <!-- lighter tree tops -->
+              <g fill="#6b7f57" opacity="0.5">
+                <circle cx="480" cy="45" r="16" />
+                <circle cx="520" cy="36" r="13" />
+                <circle cx="555" cy="46" r="15" />
+                <circle cx="590" cy="38" r="12" />
+                <circle cx="620" cy="48" r="14" />
+                <circle cx="650" cy="40" r="11" />
+                <circle cx="675" cy="50" r="13" />
+                <circle cx="700" cy="42" r="12" />
+                <circle cx="728" cy="50" r="15" />
+                <circle cx="760" cy="40" r="13" />
+              </g>
+              <text x="635" y="90" font-size="10" fill="#3a4e2e" font-style="italic" font-family="Georgia, serif" text-anchor="middle">treeline</text>
+
+              <!-- Orchard area (north-west slope) -->
+              <ellipse cx="170" cy="155" rx="115" ry="80" fill="#c8dca8" opacity="0.6" />
+              <!-- Orchard fruit trees (small circles) -->
+              <g fill="#5a7a3a" opacity="0.7">
+                <circle cx="120" cy="135" r="10" />
+                <circle cx="155" cy="125" r="9" />
+                <circle cx="190" cy="132" r="10" />
+                <circle cx="130" cy="162" r="9" />
+                <circle cx="165" cy="155" r="10" />
+                <circle cx="200" cy="160" r="9" />
+                <circle cx="145" cy="185" r="8" />
+                <circle cx="178" cy="182" r="9" />
+              </g>
+              <!-- Orchard bench -->
+              <rect x="148" y="198" width="36" height="8" rx="2" fill="#8b6145" opacity="0.9" />
+              <text x="170" y="218" font-size="9" fill="#4a5e3a" font-family="Georgia, serif" text-anchor="middle" font-style="italic">bench</text>
+
+              <!-- Driveway / main path -->
+              <path d="M400 520 Q410 420 420 360 Q430 290 440 240" stroke="#cdc8be" stroke-width="14" fill="none" stroke-linecap="round" />
+              <!-- path from house to fire pit / studio -->
+              <path d="M440 240 Q500 200 570 160" stroke="#cdc8be" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="6 4" />
+              <!-- path from house to orchard -->
+              <path d="M380 350 Q300 290 220 220 Q200 200 170 175" stroke="#cdc8be" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="6 4" />
+              <!-- path to shed (main gate area) -->
+              <path d="M400 440 Q370 430 330 420" stroke="#cdc8be" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="6 4" />
+
+              <!-- Fence line (roughly north to south on east side) -->
+              <line x1="470" y1="95" x2="460" y2="520" stroke="#9e9488" stroke-width="2" stroke-dasharray="8 5" opacity="0.5" />
+              <text x="476" y="300" font-size="9" fill="#9e9488" font-family="Georgia, serif" text-anchor="start" transform="rotate(-3 476 300)">— — fence line</text>
+
+              <!-- Main house -->
+              <rect x="360" y="310" width="80" height="60" rx="4" fill="#c4a882" stroke="#8b6145" stroke-width="1.5" />
+              <polygon points="360,310 440,310 400,280" fill="#a07850" />
+              <rect x="390" y="340" width="20" height="30" rx="2" fill="#7a5c3a" opacity="0.8" />
+              <text x="400" y="290" font-size="10" fill="#5c3d2e" font-family="Georgia, serif" text-anchor="middle" font-weight="600">house</text>
+
+              <!-- Paddock grass texture suggestion -->
+              <g stroke="#9eb87e" stroke-width="0.8" opacity="0.35">
+                <line x1="100" y1="280" x2="108" y2="272" />
+                <line x1="140" y1="300" x2="148" y2="292" />
+                <line x1="240" y1="320" x2="248" y2="312" />
+                <line x1="290" y1="270" x2="298" y2="262" />
+                <line x1="330" y1="240" x2="338" y2="232" />
+                <line x1="490" y1="280" x2="498" y2="272" />
+                <line x1="530" y1="230" x2="538" y2="222" />
+                <line x1="200" y1="380" x2="208" y2="372" />
+                <line x1="260" y1="410" x2="268" y2="402" />
+                <line x1="490" y1="350" x2="498" y2="342" />
+                <line x1="150" y1="440" x2="158" y2="432" />
+                <line x1="560" y1="380" x2="568" y2="372" />
+                <line cx="600" cy="420" x1="600" y1="420" x2="608" y2="412" />
+              </g>
+
+              <!-- Compass rose -->
+              <g transform="translate(42, 42)">
+                <circle cx="0" cy="0" r="18" fill="white" opacity="0.7" />
+                <text x="0" y="-22" font-size="10" fill="#5c3d2e" text-anchor="middle" font-family="Georgia,serif" font-weight="700">N</text>
+                <line x1="0" y1="-15" x2="0" y2="15" stroke="#5c3d2e" stroke-width="1.5" />
+                <line x1="-15" y1="0" x2="15" y2="0" stroke="#5c3d2e" stroke-width="1.5" />
+                <polygon points="0,-15 -4,-6 4,-6" fill="#5c3d2e" />
+              </g>
+
+              <!-- ═══════════════════════════════════════
+                   CLICKABLE STOP MARKERS
+                   Each is a <g> with role=button, tabindex, data attrs
+                   JS reads data-stop to populate the info panel
+              ═══════════════════════════════════════ -->
+
+              <!-- Stop 1: The Studio (NE, treeline) -->
+              <g
+                class="map-stop"
+                role="button"
+                tabindex="0"
+                aria-label="Stop 1: The Studio"
+                data-stop="1"
+                transform="translate(570, 148)"
+              >
+                <circle r="40" fill="url(#glow-studio)" />
+                <circle r="20" fill="#5c3d2e" stroke="white" stroke-width="2.5" />
+                <text y="1" font-size="13" fill="white" text-anchor="middle" dominant-baseline="middle" font-family="Georgia,serif" font-weight="700">01</text>
+                <text y="35" font-size="11" fill="#2e1f0f" text-anchor="middle" font-family="Georgia,serif" font-weight="600">The Studio</text>
+              </g>
+
+              <!-- Stop 2: The Fire Pit (NE, ridge edge, below Studio) -->
+              <g
+                class="map-stop"
+                role="button"
+                tabindex="0"
+                aria-label="Stop 2: The Fire Pit"
+                data-stop="2"
+                transform="translate(630, 220)"
+              >
+                <circle r="40" fill="url(#glow-firepit)" />
+                <circle r="20" fill="#b5722a" stroke="white" stroke-width="2.5" />
+                <text y="1" font-size="13" fill="white" text-anchor="middle" dominant-baseline="middle" font-family="Georgia,serif" font-weight="700">02</text>
+                <text y="35" font-size="11" fill="#2e1f0f" text-anchor="middle" font-family="Georgia,serif" font-weight="600">The Fire Pit</text>
+              </g>
+
+              <!-- Stop 3: The Orchard (NW slope) -->
+              <g
+                class="map-stop"
+                role="button"
+                tabindex="0"
+                aria-label="Stop 3: The Orchard"
+                data-stop="3"
+                transform="translate(170, 148)"
+              >
+                <circle r="40" fill="url(#glow-orchard)" />
+                <circle r="20" fill="#4a5e3a" stroke="white" stroke-width="2.5" />
+                <text y="1" font-size="13" fill="white" text-anchor="middle" dominant-baseline="middle" font-family="Georgia,serif" font-weight="700">03</text>
+                <text y="35" font-size="11" fill="#2e1f0f" text-anchor="middle" font-family="Georgia,serif" font-weight="600">The Orchard</text>
+              </g>
+
+              <!-- Stop 4: The Shed (S, near main gate) -->
+              <g
+                class="map-stop"
+                role="button"
+                tabindex="0"
+                aria-label="Stop 4: The Shed"
+                data-stop="4"
+                transform="translate(300, 430)"
+              >
+                <circle r="40" fill="url(#glow-shed)" />
+                <circle r="20" fill="#9e9488" stroke="white" stroke-width="2.5" />
+                <text y="1" font-size="13" fill="white" text-anchor="middle" dominant-baseline="middle" font-family="Georgia,serif" font-weight="700">04</text>
+                <text y="35" font-size="11" fill="#2e1f0f" text-anchor="middle" font-family="Georgia,serif" font-weight="600">The Shed</text>
+              </g>
+
+            </svg>
+
+            <!-- Info panel (populated by JS) -->
+            <div class="stop-info-panel" id="stop-info-panel" role="region" aria-live="polite" aria-label="Stop information">
+              <p class="stop-info-panel__eyebrow" id="panel-eyebrow">Stop 1 of 4</p>
+              <h2 class="stop-info-panel__title" id="panel-title">The Studio</h2>
+              <p class="stop-info-panel__tagline" id="panel-tagline">A comfortable and secluded creative space nestled in the treeline.</p>
+              <p class="stop-info-panel__body" id="panel-body"></p>
+              <a href="#" class="stop-info-panel__link" id="panel-link">Read more about this stop →</a>
+            </div>
+          </div>
+          <p class="map-hint">Click any numbered marker to preview that stop</p>
+        </div>
+
+        <!-- HOW TO NAVIGATE -->
+        <h2>How to Navigate</h2>
+        <div class="divider"><span class="divider-icon">✦</span></div>
+        <p>
+          Use the map above to preview each stop, or navigate directly using the
+          links at the top of every page. <em>Stops 1 &amp; 2</em> covers The
+          Studio and The Fire Pit; <em>Stops 3 &amp; 4</em> covers The Orchard
+          and The Shed. Test your knowledge on the <a href="quiz.html">Quiz</a>
+          page, and plan your walk with the <a href="tool.html">Walk Planner</a>.
+        </p>
+
+        <!-- PROJECT INFO -->
+        <h2>Project Info</h2>
+        <div class="divider"><span class="divider-icon">✦</span></div>
+        <div class="card">
+          <ul class="facts-list">
+            <li>
+              <span class="facts-list-label">Author</span>
+              <span>Writing, Photography, Coding &amp; Appreciation of Nature by Angus Forbes.</span>
+            </li>
+            <li>
+              <span class="facts-list-label">Page Word Count</span>
+              <span>~200</span>
+            </li>
+          </ul>
+        </div>
+
+      </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <div class="container">
+        <p>Southridge Farm Walking Tour &nbsp;·&nbsp; Relationship between Living Spaces &amp; Nature</p>
+        <p style="margin-top:0.4rem;">
+          <a href="index.html">Home</a> &nbsp;&middot;&nbsp;
+          <a href="stops-1-2.html">Stops 1 &amp; 2</a> &nbsp;&middot;&nbsp;
+          <a href="stops-3-4.html">Stops 3 &amp; 4</a> &nbsp;&middot;&nbsp;
+          <a href="quiz.html">Quiz</a> &nbsp;&middot;&nbsp;
+          <a href="tool.html">Walk Planner</a> &nbsp;&middot;&nbsp;
+          <a href="explanation-page.html">Written Explanation</a>
+        </p>
+      </div>
+      <div class="divider"><span class="divider-icon">✦</span></div>
+    </footer>
+
+    <script src="main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz — Southridge Farm Walking Tour</title>
+    <link rel="stylesheet" href="stylesheet.css" />
+    <style>
+      .section-container {
+        max-width: var(--max-width);
+        margin: 0 auto;
+        padding: 2.5rem 1.5rem 4rem;
+      }
+
+      /* ── Quiz shell ── */
+      .quiz-shell {
+        background: var(--color-parchment);
+        border: 1px solid var(--color-stone-light);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-card);
+        overflow: hidden;
+      }
+
+      /* Progress bar across top */
+      .quiz-progress-bar {
+        height: 5px;
+        background: var(--color-stone-light);
+        position: relative;
+      }
+
+      .quiz-progress-fill {
+        height: 100%;
+        background: var(--color-moss);
+        transition: width 0.4s ease;
+        width: 0%;
+      }
+
+      .quiz-header {
+        padding: 1.5rem 2rem 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .quiz-header__counter {
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--color-moss);
+      }
+
+      .quiz-header__score {
+        font-size: 0.8rem;
+        color: var(--color-stone);
+      }
+
+      /* Question area */
+      .quiz-question {
+        padding: 1.25rem 2rem 0;
+      }
+
+      .quiz-question h2 {
+        font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+        color: var(--color-bark);
+        line-height: 1.35;
+        margin-bottom: 0;
+      }
+
+      /* Answer options */
+      .quiz-options {
+        padding: 1.25rem 2rem 2rem;
+        display: grid;
+        gap: 0.75rem;
+      }
+
+      .quiz-option {
+        background: var(--color-cream);
+        border: 1.5px solid var(--color-stone-light);
+        border-radius: var(--radius-md);
+        padding: 0.9rem 1.25rem;
+        cursor: pointer;
+        font-family: var(--font-body);
+        font-size: 0.95rem;
+        color: var(--color-soil);
+        text-align: left;
+        width: 100%;
+        transition: border-color 0.15s, background 0.15s, transform 0.1s;
+        line-height: 1.5;
+      }
+
+      .quiz-option:hover:not(:disabled) {
+        border-color: var(--color-bark-light);
+        background: white;
+        transform: translateX(3px);
+      }
+
+      .quiz-option:focus {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
+      }
+
+      .quiz-option.is-correct {
+        background: rgba(74, 94, 58, 0.12);
+        border-color: var(--color-moss);
+        color: var(--color-moss);
+        font-weight: 600;
+      }
+
+      .quiz-option.is-wrong {
+        background: rgba(180, 50, 30, 0.08);
+        border-color: #b43214;
+        color: #8a2210;
+      }
+
+      .quiz-option:disabled {
+        cursor: default;
+      }
+
+      /* Feedback line */
+      .quiz-feedback {
+        padding: 0 2rem 1rem;
+        font-size: 0.9rem;
+        font-style: italic;
+        min-height: 1.6rem;
+        color: var(--color-bark-light);
+        display: none;
+      }
+
+      .quiz-feedback.is-visible {
+        display: block;
+      }
+
+      .quiz-feedback.correct {
+        color: var(--color-moss);
+      }
+
+      .quiz-feedback.wrong {
+        color: #8a2210;
+      }
+
+      /* Next button */
+      .quiz-actions {
+        padding: 0 2rem 2rem;
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .btn-next {
+        background: var(--color-bark);
+        color: var(--color-parchment);
+        border: none;
+        border-radius: var(--radius-sm);
+        padding: 0.6rem 1.5rem;
+        font-family: var(--font-body);
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+        display: none;
+      }
+
+      .btn-next.is-visible {
+        display: block;
+      }
+
+      .btn-next:hover {
+        background: var(--color-soil);
+      }
+
+      /* Results screen */
+      .quiz-results {
+        padding: 2.5rem 2rem;
+        text-align: center;
+        display: none;
+      }
+
+      .quiz-results.is-visible {
+        display: block;
+      }
+
+      .quiz-results__score-ring {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        background: var(--color-moss);
+        margin-bottom: 1.25rem;
+      }
+
+      .quiz-results__score-number {
+        font-family: var(--font-display);
+        font-size: 2.2rem;
+        color: var(--color-parchment);
+        font-weight: 600;
+      }
+
+      .quiz-results h2 {
+        margin-bottom: 0.5rem;
+      }
+
+      .quiz-results__verdict {
+        font-style: italic;
+        color: var(--color-bark-light);
+        margin-bottom: 1.5rem;
+      }
+
+      .btn-restart {
+        background: var(--color-moss);
+        color: var(--color-parchment);
+        border: none;
+        border-radius: var(--radius-sm);
+        padding: 0.65rem 1.75rem;
+        font-family: var(--font-body);
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      .btn-restart:hover {
+        background: var(--color-bark);
+      }
+    </style>
+  </head>
+  <body>
+
+    <!-- SITE HEADER AND NAVIGATION BAR -->
+    <header class="site-header">
+      <div class="container">
+        <a href="index.html" class="site-header-title">Southridge Farm Walking Tour</a>
+        <nav class="main-nav">
+          <a href="index.html">Home</a>
+          <a href="stops-1-2.html">Stops 1 &amp; 2</a>
+          <a href="stops-3-4.html">Stops 3 &amp; 4</a>
+          <a href="quiz.html" class="active">Quiz</a>
+          <a href="tool.html">Walk Planner</a>
+          <a href="explanation-page.html">Written Explanation</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- PAGE TITLE -->
+    <div class="page=title">
+      <div class="container">
+        <p class="breadcrumb-trail"><a href="index.html">Home</a> &rsaquo; Quiz</p>
+        <p class="page-title-indicator">Page 3 of 4</p>
+        <h1 class="page-title-first">How Well Do You Know the Farm?</h1>
+      </div>
+    </div>
+
+    <main id="main-content">
+      <div class="section-container">
+
+        <p style="margin-bottom:2rem; color:var(--color-bark-light); font-style:italic;">
+          Ten questions about the four stops on the Southridge Farm walking tour.
+          Read carefully — some answers are trickier than they look.
+        </p>
+
+        <!-- QUIZ WIDGET -->
+        <div class="quiz-shell" id="quiz-shell">
+          <div class="quiz-progress-bar">
+            <div class="quiz-progress-fill" id="quiz-progress"></div>
+          </div>
+
+          <!-- Active question view -->
+          <div id="quiz-active">
+            <div class="quiz-header">
+              <span class="quiz-header__counter" id="quiz-counter">Question 1 of 10</span>
+              <span class="quiz-header__score" id="quiz-score-display">Score: 0</span>
+            </div>
+            <div class="quiz-question">
+              <h2 id="quiz-question-text"></h2>
+            </div>
+            <div class="quiz-options" id="quiz-options"></div>
+            <div class="quiz-feedback" id="quiz-feedback"></div>
+            <div class="quiz-actions">
+              <button class="btn-next" id="btn-next">Next question →</button>
+            </div>
+          </div>
+
+          <!-- Results view (hidden until end) -->
+          <div class="quiz-results" id="quiz-results">
+            <div class="quiz-results__score-ring">
+              <span class="quiz-results__score-number" id="results-score-number">0/10</span>
+            </div>
+            <h2 id="results-title">Well done!</h2>
+            <p class="quiz-results__verdict" id="results-verdict"></p>
+            <p style="margin-bottom:1.5rem; font-size:0.95rem;" id="results-detail"></p>
+            <button class="btn-restart" id="btn-restart">Try again</button>
+          </div>
+        </div>
+
+        <div style="margin-top:2rem;">
+          <a href="index.html">&larr; Back to the map</a>
+          &nbsp;&nbsp;
+          <a href="tool.html">Try the Walk Planner →</a>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <div class="container">
+        <p>Southridge Farm Walking Tour &nbsp;·&nbsp; Relationship between Living Spaces &amp; Nature</p>
+        <p style="margin-top:0.4rem;">
+          <a href="index.html">Home</a> &nbsp;&middot;&nbsp;
+          <a href="stops-1-2.html">Stops 1 &amp; 2</a> &nbsp;&middot;&nbsp;
+          <a href="stops-3-4.html">Stops 3 &amp; 4</a> &nbsp;&middot;&nbsp;
+          <a href="quiz.html">Quiz</a> &nbsp;&middot;&nbsp;
+          <a href="tool.html">Walk Planner</a> &nbsp;&middot;&nbsp;
+          <a href="explanation-page.html">Written Explanation</a>
+        </p>
+      </div>
+      <div class="divider"><span class="divider-icon">✦</span></div>
+    </footer>
+
+    <script src="main.js"></script>
+  </body>
+</html>
